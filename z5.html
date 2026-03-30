@@ -38,9 +38,6 @@
 <body>
  
 <script>
-  // =========================
-  // ZADATAK 1 - JSON PODACI
-  // =========================
   var podaciZupanije = [
     { "zupanija": "Zagrebačka", "stanovnici": 317606, "gradovi": 9, "naselja": 694 },
     { "zupanija": "Krapinsko-zagorska", "stanovnici": 132892, "gradovi": 7, "naselja": 423 },
@@ -54,9 +51,7 @@
     { "zupanija": "Virovitičko-podravska", "stanovnici": 84836, "gradovi": 3, "naselja": 188 }
   ];
  
-  // =========================
   // POSTAVKE GRAFA
-  // =========================
   var margin = { top: 60, right: 150, bottom: 140, left: 80 };
   var width = 1100 - margin.left - margin.right;
   var height = 550 - margin.top - margin.bottom;
@@ -113,14 +108,10 @@
     .attr("text-anchor", "middle")
     .text("Tri skupa podataka na istom linijskom grafu");
  
-  // =========================
   // ZADATAK 5 - TRI LINIJE
-  // Napomena:
-  // gradovi i naselja su skalirani da se vide uz stanovnike
-  // =========================
-  var lineStanovnici = d3.line()
-    .x(d => x(d.zupanija))
-    .y(d => y(d.stanovnici));
+  var lineStanovnici = d3.line() // crta liniju za stanovnike 
+    .x(d => x(d.zupanija))  // tocka po sirini
+    .y(d => y(d.stanovnici));  // tocka po visini
  
   var lineGradovi = d3.line()
     .x(d => x(d.zupanija))
@@ -130,11 +121,15 @@
     .x(d => x(d.zupanija))
     .y(d => y(d.naselja * 500));
  
-  svg.append("path")
-    .datum(podaciZupanije)
+
+// plava -> stanovnici
+// crvena -> gradovi
+// zelena -> naselja
+  svg.append("path")  // crta liniju
+    .datum(podaciZupanije)  // cijeli dataset uzme
     .attr("class", "line")
-    .attr("d", lineStanovnici)
-    .attr("stroke", "blue");
+    .attr("d", lineStanovnici) // definira izgled linije
+    .attr("stroke", "blue"); // PONOVI 
  
   svg.append("path")
     .datum(podaciZupanije)
@@ -149,12 +144,12 @@
     .attr("stroke", "green");
  
   // Točke
-  svg.selectAll(".dot-stan")
+  svg.selectAll(".dot-stan") // za svaku zupaniju ncrtaj tocku 
     .data(podaciZupanije)
     .enter()
     .append("circle")
-    .attr("cx", d => x(d.zupanija))
-    .attr("cy", d => y(d.stanovnici))
+    .attr("cx", d => x(d.zupanija))  // x pozicija
+    .attr("cy", d => y(d.stanovnici))  // y pozicija
     .attr("r", 4)
     .attr("fill", "blue");
  
@@ -177,17 +172,17 @@
     .attr("fill", "green");
  
   // Legenda
-  var legend = svg.append("g")
+  var legend = svg.append("g") 
     .attr("class", "legend")
     .attr("transform", "translate(" + (width + 20) + ",20)");
  
-  legend.append("line")
+  legend.append("line") // crta liniju za legenfu
     .attr("x1", 0).attr("y1", 0)
     .attr("x2", 20).attr("y2", 0)
     .attr("stroke", "blue")
     .attr("stroke-width", 3);
  
-  legend.append("text")
+  legend.append("text") // sa tekstom
     .attr("x", 30)
     .attr("y", 5)
     .text("Stanovnici");

@@ -34,9 +34,7 @@
 <body>
 
 <script>
-  // =========================
   // ZADATAK 1 - JSON PODACI
-  // =========================
   var podaciZupanije = [
     { "zupanija": "Zagrebačka", "stanovnici": 317606, "gradovi": 9, "naselja": 694 },
     { "zupanija": "Krapinsko-zagorska", "stanovnici": 132892, "gradovi": 7, "naselja": 423 },
@@ -50,25 +48,24 @@
     { "zupanija": "Virovitičko-podravska", "stanovnici": 84836, "gradovi": 3, "naselja": 188 }
   ];
 
-  // =========================
   // POSTAVKE GRAFA
-  // =========================
-  var margin = { top: 60, right: 20, bottom: 140, left: 90 };
+  var margin = { top: 60, right: 20, bottom: 140, left: 90 }; // prostor oko grafa
   var width = 1000 - margin.left - margin.right;
   var height = 550 - margin.top - margin.bottom;
 
-  var svg = d3.select("body")
+  var svg = d3.select("body")  // u body dodaj platno za crtanje svg
     .append("svg")
-    .attr("width", width + margin.left + margin.right)
+    .attr("width", width + margin.left + margin.right) // velicina platna w i h
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")"); // pomak grafa da ima mjesta za osi
 
-  // =========================
-  // ZADATAK 4 - ORDINALNA SKALA S 10 BOJA
-  // =========================
-  var boje = d3.scaleOrdinal()
-    .domain(podaciZupanije.map(d => d.zupanija))
+  // ZADATAK 4
+  // scaleOrdinal -> kategorije -> boje
+  // scaleBand -> kategorije -> X pozicija
+  // scaleLinear -> brojevi -> Y pozicija
+  var boje = d3.scaleOrdinal() // svakoj zupaniji dodijeli jednu boju
+    .domain(podaciZupanije.map(d => d.zupanija)) // za svaki naziv zupanije
     .range([
       "#1f77b4",
       "#ff7f0e",
@@ -83,61 +80,58 @@
     ]);
 
   // X skala
-  var x = d3.scaleBand()
-    .domain(podaciZupanije.map(d => d.zupanija))
-    .range([0, width])
-    .padding(0.2);
+  var x = d3.scaleBand() // za diskrente pod. (tekst) daje sirinu stupca
+    .domain(podaciZupanije.map(d => d.zupanija)) // za svaki naziv zupanije
+    .range([0, width]) // cijela sirina grafa
+    .padding(0.2); // razmak izmedu stupaca
 
   // Y skala
-  var y = d3.scaleLinear()
-    .domain([0, d3.max(podaciZupanije, d => d.stanovnici)])
-    .nice()
+  var y = d3.scaleLinear() // koristi se za brojeve za stanovnike
+    .domain([0, d3.max(podaciZupanije, d => d.stanovnici)]) // [0, max vrijednost] domena
+    .nice() // pretvara broj u visinu
     .range([height, 0]);
 
-  // =========================
   // ZADATAK 2 - STUPČASTI GRAF
-  // =========================
-  svg.selectAll("rect")
-    .data(podaciZupanije)
-    .enter()
-    .append("rect")
-    .attr("x", d => x(d.zupanija))
-    .attr("y", d => y(d.stanovnici))
-    .attr("width", x.bandwidth())
-    .attr("height", d => height - y(d.stanovnici))
-    .attr("fill", d => boje(d.zupanija));
+  svg.selectAll("rect") // biraj sve prevokutnike - trenutno ih nema
+    .data(podaciZupanije) // povezi ove podatke
+    .enter()              // za svaki novi podatak napravi element
+    .append("rect")      // dodaj mu pravokutnik
+    .attr("x", d => x(d.zupanija)) // određuje vodoravni položaj stupca, uzima ime županije i preko x skale nađe gdje ide stupac
+    .attr("y", d => y(d.stanovnici)) // odreduje koliko visoko ide stupac
+    .attr("width", x.bandwidth())  // širina stupca na X skali
+    .attr("height", d => height - y(d.stanovnici)) // odreduje visinu stupca 
+    .attr("fill", d => boje(d.zupanija)); // odreduje boju stupca
 
   // X os
-  svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x))
-    .selectAll("text")
+  svg.append("g")  // dodaje grupu za os
+    .attr("class", "x axis")  
+    .attr("transform", "translate(0," + height + ")") // spušta os dolje
+    .call(d3.axisBottom(x))  // napravi X os pomocu X skale - do tu se napravi da se na dnu ispisu nazivi zupanija
+    .selectAll("text")  // ovaj dio samo zakrivi nazive zupanija ukoso
     .attr("transform", "rotate(-40)")
     .style("text-anchor", "end");
 
   // Y os
-  svg.append("g")
-    .attr("class", "y axis")
-    .call(d3.axisLeft(y));
+  svg.append("g") // ovo dodaje lijevu os 
+    .attr("class", "y axis")  // koristi y skalu
+    .call(d3.axisLeft(y)); // prikazuje brojeve stanovnika tj vrijednosti
 
-  // =========================
+
   // ZADATAK 3 - NAZIVI OSI
-  // =========================
-  svg.append("text")
-    .attr("class", "axis-label")
-    .attr("x", width / 2)
-    .attr("y", height + 120)
-    .attr("text-anchor", "middle")
-    .text("Županija");
+  svg.append("text")  // dodaje tekst
+    .attr("class", "axis-label")  
+    .attr("x", width / 2) // centar grafa
+    .attr("y", height + 120)  // ispod grafa
+    .attr("text-anchor", "middle")// centriaj tekst
+    .text("Županija"); // napisi zupanija tj naziv X osi
 
   svg.append("text")
     .attr("class", "axis-label")
-    .attr("transform", "rotate(-90)")
-    .attr("x", -height / 2)
-    .attr("y", -60)
+    .attr("transform", "rotate(-90)")  // tekst ce ic vertikalno
+    .attr("x", -height / 2)  // centriraj po visini
+    .attr("y", -60)         // pomak od lijevog ruba
     .attr("text-anchor", "middle")
-    .text("Broj stanovnika");
+    .text("Broj stanovnika");  // napisi broj stavnovnika
 
   // Naslov
   svg.append("text")
@@ -145,7 +139,7 @@
     .attr("x", width / 2)
     .attr("y", -20)
     .attr("text-anchor", "middle")
-    .text("Broj stanovnika po županijama");
+    .text("Broj stanovnika po županijama"); // iznad grafa centiraj i napisi naslov
 </script>
 
 </body>

@@ -35,13 +35,11 @@
 <body>
  
 <script>
-  // =========================
-  // ZADATAK 6 - GENERIRANI PODACI S DATUMIMA
-  // =========================
-  var parseDate = d3.timeParse("%Y-%m-%d");
+  // ZADATAK 6
+  var parseDate = d3.timeParse("%Y-%m-%d");  // pretvori tekst u datum
  
   var data = [
-    { datum: parseDate("2024-01-01"), vrijednost: 12 },
+    { datum: parseDate("2024-01-01"), vrijednost: 12 },   // datum x os, vrijednost y os
     { datum: parseDate("2024-02-01"), vrijednost: 18 },
     { datum: parseDate("2024-03-01"), vrijednost: 10 },
     { datum: parseDate("2024-04-01"), vrijednost: 22 },
@@ -65,12 +63,12 @@
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
  
   // X skala - vrijeme
-  var x = d3.scaleTime()
-    .domain(d3.extent(data, d => d.datum))
-    .range([0, width]);
+  var x = d3.scaleTime()      // vrijeme ide s desna na lijevo
+    .domain(d3.extent(data, d => d.datum))  // uzima min i max datum 
+    .range([0, width]);                     // automatski rasporeduje sve datume
  
   // Y skala
-  var y = d3.scaleLinear()
+  var y = d3.scaleLinear()    // isto kao x os ali radi za vrijednosti
     .domain([0, d3.max(data, d => d.vrijednost)])
     .nice()
     .range([height, 0]);
@@ -79,24 +77,24 @@
   svg.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(x).ticks(10));
+    .call(d3.axisBottom(x).ticks(10));     // x os prikazuje datume i ticks je koliko oznaka ima
  
   svg.append("g")
     .attr("class", "y axis")
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y));    // prikazuje brojeve
  
   // Linija
-  var line = d3.line()
+  var line = d3.line()   // X = datum a Y = vrijednost
     .x(d => x(d.datum))
     .y(d => y(d.vrijednost));
  
-  svg.append("path")
+  svg.append("path")    // crta liniju kroz sve tocke 
     .datum(data)
     .attr("class", "line")
     .attr("d", line);
  
   // Točke
-  svg.selectAll("circle")
+  svg.selectAll("circle") // za svaku vrijednost crta tocku
     .data(data)
     .enter()
     .append("circle")
