@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Zadatak 5 - Tri linije na istom grafu</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+ 
+    .axis {
+      font: 12px sans-serif;
+    }
+ 
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+ 
+    .line {
+      fill: none;
+      stroke-width: 3;
+    }
+ 
+    .legend text {
+      font-size: 12px;
+    }
+ 
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+ 
+<script>
+  // =========================
+  // ZADATAK 1 - JSON PODACI
+  // =========================
+  var podaciZupanije = [
+    { "zupanija": "Zagrebačka", "stanovnici": 317606, "gradovi": 9, "naselja": 694 },
+    { "zupanija": "Krapinsko-zagorska", "stanovnici": 132892, "gradovi": 7, "naselja": 423 },
+    { "zupanija": "Sisačko-moslavačka", "stanovnici": 172439, "gradovi": 6, "naselja": 456 },
+    { "zupanija": "Karlovačka", "stanovnici": 128899, "gradovi": 5, "naselja": 649 },
+    { "zupanija": "Varaždinska", "stanovnici": 175951, "gradovi": 6, "naselja": 302 },
+    { "zupanija": "Koprivničko-križevačka", "stanovnici": 115584, "gradovi": 3, "naselja": 264 },
+    { "zupanija": "Bjelovarsko-bilogorska", "stanovnici": 119764, "gradovi": 5, "naselja": 323 },
+    { "zupanija": "Primorsko-goranska", "stanovnici": 296195, "gradovi": 14, "naselja": 510 },
+    { "zupanija": "Ličko-senjska", "stanovnici": 50927, "gradovi": 4, "naselja": 255 },
+    { "zupanija": "Virovitičko-podravska", "stanovnici": 84836, "gradovi": 3, "naselja": 188 }
+  ];
+ 
+  // =========================
+  // POSTAVKE GRAFA
+  // =========================
+  var margin = { top: 60, right: 150, bottom: 140, left: 80 };
+  var width = 1100 - margin.left - margin.right;
+  var height = 550 - margin.top - margin.bottom;
+ 
+  var svg = d3.select("body")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+ 
+  var x = d3.scalePoint()
+    .domain(podaciZupanije.map(d => d.zupanija))
+    .range([0, width]);
+ 
+  var y = d3.scaleLinear()
+    .domain([0, d3.max(podaciZupanije, d => Math.max(d.stanovnici, d.gradovi * 20000, d.naselja * 500))])
+    .nice()
+    .range([height, 0]);
+ 
+  // Osi
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("transform", "rotate(-40)")
+    .style("text-anchor", "end");
+ 
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(y));
+ 
+  // Nazivi osi
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height + 120)
+    .attr("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .text("Županija");
+ 
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -50)
+    .attr("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .text("Vrijednost");
+ 
+  svg.append("text")
+    .attr("class", "title")
+    .attr("x", width / 2)
+    .attr("y", -20)
+    .attr("text-anchor", "middle")
+    .text("Tri skupa podataka na istom linijskom grafu");
+ 
+  // =========================
+  // ZADATAK 5 - TRI LINIJE
+  // Napomena:
+  // gradovi i naselja su skalirani da se vide uz stanovnike
+  // =========================
+  var lineStanovnici = d3.line()
+    .x(d => x(d.zupanija))
+    .y(d => y(d.stanovnici));
+ 
+  var lineGradovi = d3.line()
+    .x(d => x(d.zupanija))
+    .y(d => y(d.gradovi * 20000));
+ 
+  var lineNaselja = d3.line()
+    .x(d => x(d.zupanija))
+    .y(d => y(d.naselja * 500));
+ 
+  svg.append("path")
+    .datum(podaciZupanije)
+    .attr("class", "line")
+    .attr("d", lineStanovnici)
+    .attr("stroke", "blue");
+ 
+  svg.append("path")
+    .datum(podaciZupanije)
+    .attr("class", "line")
+    .attr("d", lineGradovi)
+    .attr("stroke", "red");
+ 
+  svg.append("path")
+    .datum(podaciZupanije)
+    .attr("class", "line")
+    .attr("d", lineNaselja)
+    .attr("stroke", "green");
+ 
+  // Točke
+  svg.selectAll(".dot-stan")
+    .data(podaciZupanije)
+    .enter()
+    .append("circle")
+    .attr("cx", d => x(d.zupanija))
+    .attr("cy", d => y(d.stanovnici))
+    .attr("r", 4)
+    .attr("fill", "blue");
+ 
+  svg.selectAll(".dot-grad")
+    .data(podaciZupanije)
+    .enter()
+    .append("circle")
+    .attr("cx", d => x(d.zupanija))
+    .attr("cy", d => y(d.gradovi * 20000))
+    .attr("r", 4)
+    .attr("fill", "red");
+ 
+  svg.selectAll(".dot-nas")
+    .data(podaciZupanije)
+    .enter()
+    .append("circle")
+    .attr("cx", d => x(d.zupanija))
+    .attr("cy", d => y(d.naselja * 500))
+    .attr("r", 4)
+    .attr("fill", "green");
+ 
+  // Legenda
+  var legend = svg.append("g")
+    .attr("class", "legend")
+    .attr("transform", "translate(" + (width + 20) + ",20)");
+ 
+  legend.append("line")
+    .attr("x1", 0).attr("y1", 0)
+    .attr("x2", 20).attr("y2", 0)
+    .attr("stroke", "blue")
+    .attr("stroke-width", 3);
+ 
+  legend.append("text")
+    .attr("x", 30)
+    .attr("y", 5)
+    .text("Stanovnici");
+ 
+  legend.append("line")
+    .attr("x1", 0).attr("y1", 30)
+    .attr("x2", 20).attr("y2", 30)
+    .attr("stroke", "red")
+    .attr("stroke-width", 3);
+ 
+  legend.append("text")
+    .attr("x", 30)
+    .attr("y", 35)
+    .text("Gradovi × 20000");
+ 
+  legend.append("line")
+    .attr("x1", 0).attr("y1", 60)
+    .attr("x2", 20).attr("y2", 60)
+    .attr("stroke", "green")
+    .attr("stroke-width", 3);
+ 
+  legend.append("text")
+    .attr("x", 30)
+    .attr("y", 65)
+    .text("Naselja × 500");
+</script>
+ 
+</body>
+</html>

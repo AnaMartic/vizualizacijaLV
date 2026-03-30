@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Zadatak 6 - Linijski graf s datumima</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+ 
+    .axis {
+      font: 12px sans-serif;
+    }
+ 
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+ 
+    .line {
+      fill: none;
+      stroke: purple;
+      stroke-width: 3;
+    }
+ 
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+ 
+<script>
+  // =========================
+  // ZADATAK 6 - GENERIRANI PODACI S DATUMIMA
+  // =========================
+  var parseDate = d3.timeParse("%Y-%m-%d");
+ 
+  var data = [
+    { datum: parseDate("2024-01-01"), vrijednost: 12 },
+    { datum: parseDate("2024-02-01"), vrijednost: 18 },
+    { datum: parseDate("2024-03-01"), vrijednost: 10 },
+    { datum: parseDate("2024-04-01"), vrijednost: 22 },
+    { datum: parseDate("2024-05-01"), vrijednost: 28 },
+    { datum: parseDate("2024-06-01"), vrijednost: 20 },
+    { datum: parseDate("2024-07-01"), vrijednost: 35 },
+    { datum: parseDate("2024-08-01"), vrijednost: 30 },
+    { datum: parseDate("2024-09-01"), vrijednost: 40 },
+    { datum: parseDate("2024-10-01"), vrijednost: 32 }
+  ];
+ 
+  var margin = { top: 60, right: 30, bottom: 80, left: 70 };
+  var width = 900 - margin.left - margin.right;
+  var height = 500 - margin.top - margin.bottom;
+ 
+  var svg = d3.select("body")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+ 
+  // X skala - vrijeme
+  var x = d3.scaleTime()
+    .domain(d3.extent(data, d => d.datum))
+    .range([0, width]);
+ 
+  // Y skala
+  var y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => d.vrijednost)])
+    .nice()
+    .range([height, 0]);
+ 
+  // Osi
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x).ticks(10));
+ 
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(y));
+ 
+  // Linija
+  var line = d3.line()
+    .x(d => x(d.datum))
+    .y(d => y(d.vrijednost));
+ 
+  svg.append("path")
+    .datum(data)
+    .attr("class", "line")
+    .attr("d", line);
+ 
+  // Točke
+  svg.selectAll("circle")
+    .data(data)
+    .enter()
+    .append("circle")
+    .attr("cx", d => x(d.datum))
+    .attr("cy", d => y(d.vrijednost))
+    .attr("r", 4)
+    .attr("fill", "purple");
+ 
+  // Nazivi osi
+  svg.append("text")
+    .attr("x", width / 2)
+    .attr("y", height + 50)
+    .attr("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .text("Vrijeme");
+ 
+  svg.append("text")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -45)
+    .attr("text-anchor", "middle")
+    .style("font-weight", "bold")
+    .text("Vrijednost");
+ 
+  svg.append("text")
+    .attr("class", "title")
+    .attr("x", width / 2)
+    .attr("y", -20)
+    .attr("text-anchor", "middle")
+    .text("Linijski graf s datumima");
+</script>
+ 
+</body>
+</html>

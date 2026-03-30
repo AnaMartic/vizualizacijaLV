@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Zadatak 2 3 4 - Stupčasti graf</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    .axis {
+      font: 12px sans-serif;
+    }
+
+    .axis path,
+    .axis line {
+      fill: none;
+      stroke: #000;
+      shape-rendering: crispEdges;
+    }
+
+    .axis-label {
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+  </style>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+
+<script>
+  // =========================
+  // ZADATAK 1 - JSON PODACI
+  // =========================
+  var podaciZupanije = [
+    { "zupanija": "Zagrebačka", "stanovnici": 317606, "gradovi": 9, "naselja": 694 },
+    { "zupanija": "Krapinsko-zagorska", "stanovnici": 132892, "gradovi": 7, "naselja": 423 },
+    { "zupanija": "Sisačko-moslavačka", "stanovnici": 172439, "gradovi": 6, "naselja": 456 },
+    { "zupanija": "Karlovačka", "stanovnici": 128899, "gradovi": 5, "naselja": 649 },
+    { "zupanija": "Varaždinska", "stanovnici": 175951, "gradovi": 6, "naselja": 302 },
+    { "zupanija": "Koprivničko-križevačka", "stanovnici": 115584, "gradovi": 3, "naselja": 264 },
+    { "zupanija": "Bjelovarsko-bilogorska", "stanovnici": 119764, "gradovi": 5, "naselja": 323 },
+    { "zupanija": "Primorsko-goranska", "stanovnici": 296195, "gradovi": 14, "naselja": 510 },
+    { "zupanija": "Ličko-senjska", "stanovnici": 50927, "gradovi": 4, "naselja": 255 },
+    { "zupanija": "Virovitičko-podravska", "stanovnici": 84836, "gradovi": 3, "naselja": 188 }
+  ];
+
+  // =========================
+  // POSTAVKE GRAFA
+  // =========================
+  var margin = { top: 60, right: 20, bottom: 140, left: 90 };
+  var width = 1000 - margin.left - margin.right;
+  var height = 550 - margin.top - margin.bottom;
+
+  var svg = d3.select("body")
+    .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // =========================
+  // ZADATAK 4 - ORDINALNA SKALA S 10 BOJA
+  // =========================
+  var boje = d3.scaleOrdinal()
+    .domain(podaciZupanije.map(d => d.zupanija))
+    .range([
+      "#1f77b4",
+      "#ff7f0e",
+      "#2ca02c",
+      "#d62728",
+      "#9467bd",
+      "#8c564b",
+      "#e377c2",
+      "#7f7f7f",
+      "#bcbd22",
+      "#17becf"
+    ]);
+
+  // X skala
+  var x = d3.scaleBand()
+    .domain(podaciZupanije.map(d => d.zupanija))
+    .range([0, width])
+    .padding(0.2);
+
+  // Y skala
+  var y = d3.scaleLinear()
+    .domain([0, d3.max(podaciZupanije, d => d.stanovnici)])
+    .nice()
+    .range([height, 0]);
+
+  // =========================
+  // ZADATAK 2 - STUPČASTI GRAF
+  // =========================
+  svg.selectAll("rect")
+    .data(podaciZupanije)
+    .enter()
+    .append("rect")
+    .attr("x", d => x(d.zupanija))
+    .attr("y", d => y(d.stanovnici))
+    .attr("width", x.bandwidth())
+    .attr("height", d => height - y(d.stanovnici))
+    .attr("fill", d => boje(d.zupanija));
+
+  // X os
+  svg.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(x))
+    .selectAll("text")
+    .attr("transform", "rotate(-40)")
+    .style("text-anchor", "end");
+
+  // Y os
+  svg.append("g")
+    .attr("class", "y axis")
+    .call(d3.axisLeft(y));
+
+  // =========================
+  // ZADATAK 3 - NAZIVI OSI
+  // =========================
+  svg.append("text")
+    .attr("class", "axis-label")
+    .attr("x", width / 2)
+    .attr("y", height + 120)
+    .attr("text-anchor", "middle")
+    .text("Županija");
+
+  svg.append("text")
+    .attr("class", "axis-label")
+    .attr("transform", "rotate(-90)")
+    .attr("x", -height / 2)
+    .attr("y", -60)
+    .attr("text-anchor", "middle")
+    .text("Broj stanovnika");
+
+  // Naslov
+  svg.append("text")
+    .attr("class", "title")
+    .attr("x", width / 2)
+    .attr("y", -20)
+    .attr("text-anchor", "middle")
+    .text("Broj stanovnika po županijama");
+</script>
+
+</body>
+</html>
